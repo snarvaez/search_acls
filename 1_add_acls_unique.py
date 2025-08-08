@@ -1,5 +1,5 @@
 import random
-from pymongo import MongoClient
+from pymongo import MongoClient, UpdateOne
 import os
 from dotenv import load_dotenv
 from pymongo.errors import BulkWriteError
@@ -60,18 +60,16 @@ def main():
         
         for doc in cursor:
             # Prepare update operation
-            update_operation = {
-                "updateOne": {
-                    "filter": {"_id": doc["_id"]},
-                    "update": {
-                        "$set": {
-                            "ACL1": generate_acl_array(),
-                            "ACL2": generate_acl_array(),
-                            "ACL3": generate_acl_array()
-                        }
+            update_operation = UpdateOne(
+                {"_id": doc["_id"]},
+                {
+                    "$set": {
+                        "ACL1": generate_acl_array(),
+                        "ACL2": generate_acl_array(),
+                        "ACL3": generate_acl_array()
                     }
                 }
-            }
+            )
             
             batch_operations.append(update_operation)
             operations += 1
@@ -167,7 +165,7 @@ def dry_run():
     print(f"Documents that already have ACL1 field: {docs_with_acls}")
 
     client.close()
-    print("Dry run completed. Use 'python3 add_acls_unique.py --run' to execute the actual update.")
+    print("Dry run completed. Use 'python3 1_add_acls_unique.py --run' to execute the actual update.")
 
 if __name__ == "__main__":
     import sys
